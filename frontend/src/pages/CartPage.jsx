@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import FormInput from "../components/FormInput";
 import { placeOrder } from "../api";
 
 export default function CartPage() {
   const { items, remove, setQty, clear } = useCart();
-  const [form, setForm] = useState({ firstName: "", lastName: "", address: "" });
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+  });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
@@ -56,23 +59,33 @@ export default function CartPage() {
             >
               <div className="flex items-center gap-4">
                 <img
-                  src={i.image}
+                  src={Array.isArray(i.images) ? i.images[0] : i.images}
                   alt={i.name}
-                  className="w-20 h-16 rounded object-cover"
+                  className="w-20 h-16 rounded object-cover border"
                 />
                 <div>
                   <p className="font-medium">{i.name}</p>
                   <p className="text-sm text-gray-600">₹{i.price}</p>
                 </div>
               </div>
+
               <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  value={i.qty}
-                  onChange={(e) => setQty(i.id, Number(e.target.value))}
-                  className="w-16 border rounded px-2 py-1"
-                />
+                <div className="flex items-center border rounded">
+                  <button
+                    onClick={() => setQty(i.id, Math.max(1, i.qty - 1))}
+                    className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-100"
+                  >
+                    −
+                  </button>
+                  <span className="px-4 py-1 border-x">{i.qty}</span>
+                  <button
+                    onClick={() => setQty(i.id, i.qty + 1)}
+                    className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-100"
+                  >
+                    +
+                  </button>
+                </div>
+
                 <button
                   onClick={() => remove(i.id)}
                   className="text-red-600 hover:text-red-800 text-sm"
@@ -85,34 +98,65 @@ export default function CartPage() {
         )}
       </div>
 
-      {/* Summary + Form */}
       <aside className="bg-white p-6 rounded-xl shadow">
         <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
         <p className="mb-4 text-gray-700">
           Total: <span className="font-bold">₹{total}</span>
         </p>
 
-        <FormInput
-          label="First Name"
-          name="firstName"
-          value={form.firstName}
-          onChange={onChange}
-          required
-        />
-        <FormInput
-          label="Last Name"
-          name="lastName"
-          value={form.lastName}
-          onChange={onChange}
-          required
-        />
-        <FormInput
-          label="Address"
-          name="address"
-          value={form.address}
-          onChange={onChange}
-          required
-        />
+        <div className="mb-4">
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            First Name
+          </label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={form.firstName}
+            onChange={onChange}
+            required
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Last Name
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={form.lastName}
+            onChange={onChange}
+            required
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="address"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Address
+          </label>
+          <textarea
+            id="address"
+            name="address"
+            value={form.address}
+            onChange={onChange}
+            required
+            rows="3"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          ></textarea>
+        </div>
 
         {message && (
           <div
