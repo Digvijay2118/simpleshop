@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { placeOrder } from "../api";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function CartPage() {
   const { items, remove, setQty, clear } = useCart();
@@ -10,7 +13,13 @@ export default function CartPage() {
     address: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
+  const navigate = useNavigate();
+
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    productId: null,
+    productName: "",
+  });
 
   const total = items.reduce((s, i) => s + i.price * i.qty, 0);
 
@@ -20,13 +29,12 @@ export default function CartPage() {
   }
 
   async function handlePlaceOrder() {
-    setMessage(null);
     if (!form.firstName || !form.lastName || !form.address) {
-      setMessage({ type: "error", text: "Please fill all required fields" });
+      toast.error("Please fill all required fields");
       return;
     }
     if (items.length === 0) {
-      setMessage({ type: "error", text: "Cart is empty" });
+      toast.error("Cart is empty");
       return;
     }
 
@@ -34,14 +42,30 @@ export default function CartPage() {
       setLoading(true);
       const payload = { ...form, items, total };
       const res = await placeOrder(payload);
-      setMessage({ type: "success", text: res.message });
+      toast.success("Order placed successfully!");
       clear();
       setForm({ firstName: "", lastName: "", address: "" });
     } catch (err) {
-      setMessage({ type: "error", text: err.message || "Order failed" });
+      toast.error("Order failed!");
     } finally {
       setLoading(false);
     }
+  }
+
+  function openRemoveModal(id, name) {
+    setConfirmModal({ open: true, productId: id, productName: name });
+  }
+
+  function confirmRemove() {
+    if (confirmModal.productId) {
+      remove(confirmModal.productId);
+      toast.info(`${confirmModal.productName} removed from cart`);
+    }
+    setConfirmModal({ open: false, productId: null, productName: "" });
+  }
+
+  function cancelRemove() {
+    setConfirmModal({ open: false, productId: null, productName: "" });
   }
 
   return (
@@ -49,8 +73,19 @@ export default function CartPage() {
       {/* Cart Items */}
       <div className="md:col-span-2 bg-white p-6 rounded-xl shadow">
         <h2 className="text-2xl font-semibold mb-4">Your Cart</h2>
+
         {items.length === 0 ? (
-          <p className="text-gray-600">Your cart is empty.</p>
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <p className="text-gray-600 mb-4">
+              Your cart is empty. Add items to it now!
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              Shop Now
+            </button>
+          </div>
         ) : (
           items.map((i) => (
             <div
@@ -87,7 +122,7 @@ export default function CartPage() {
                 </div>
 
                 <button
-                  onClick={() => remove(i.id)}
+                  onClick={() => openRemoveModal(i.id, i.name)}
                   className="text-red-600 hover:text-red-800 text-sm"
                 >
                   Remove
@@ -98,86 +133,56 @@ export default function CartPage() {
         )}
       </div>
 
-      <aside className="bg-white p-6 rounded-xl shadow">
-        <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
-        <p className="mb-4 text-gray-700">
-          Total: <span className="font-bold">₹{total}</span>
-        </p>
+      {/* Order Summary */}
+      {items.length > 0 && (
+        <aside className="bg-white p-6 rounded-xl shadow">
+          <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+          <p className="mb-4 text-gray-700">
+            Total: <span className="font-bold">₹{total}</span>
+          </p>
 
-        <div className="mb-4">
-          <label
-            htmlFor="firstName"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            First Name
-          </label>
           <input
             type="text"
-            id="firstName"
             name="firstName"
             value={form.firstName}
             onChange={onChange}
-            required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="First Name"
+            className="w-full border px-3 py-2 rounded mb-3"
           />
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="lastName"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Last Name
-          </label>
           <input
             type="text"
-            id="lastName"
             name="lastName"
             value={form.lastName}
             onChange={onChange}
-            required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Last Name"
+            className="w-full border px-3 py-2 rounded mb-3"
           />
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="address"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Address
-          </label>
           <textarea
-            id="address"
             name="address"
             value={form.address}
             onChange={onChange}
-            required
+            placeholder="Address"
             rows="3"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border px-3 py-2 rounded mb-3 resize-none"
           ></textarea>
-        </div>
 
-        {message && (
-          <div
-            className={`mt-4 p-3 rounded text-sm ${
-              message.type === "error"
-                ? "bg-red-100 text-red-700"
-                : "bg-green-100 text-green-700"
-            }`}
+          <button
+            onClick={handlePlaceOrder}
+            disabled={loading}
+            className="mt-3 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
           >
-            {message.text}
-          </div>
-        )}
+            {loading ? "Placing..." : "Place Order"}
+          </button>
+        </aside>
+      )}
 
-        <button
-          onClick={handlePlaceOrder}
-          disabled={loading}
-          className="mt-5 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
-        >
-          {loading ? "Placing..." : "Place Order"}
-        </button>
-      </aside>
+      <ConfirmModal
+        open={confirmModal.open}
+        title="Remove Item"
+        message={`Are you sure you want to remove "${confirmModal.productName}" from your cart?`}
+        onCancel={cancelRemove}
+        onConfirm={confirmRemove}
+      />
     </div>
   );
 }

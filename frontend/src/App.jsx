@@ -15,7 +15,7 @@ export default function App() {
           <Route path="/cart" element={<CartPage />} />
         </Routes>
       </main>
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={2000} />
     </div>
   );
 }

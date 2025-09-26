@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+
 
 export default function ProductCard({ product, onAdd }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -15,6 +17,11 @@ export default function ProductCard({ product, onAdd }) {
     }
     return () => clearInterval(interval);
   }, [hovering, product.images]);
+
+   const handleAdd = () => {
+    onAdd(product);
+    toast.success(`${product.name} added to cart`);
+  };
 
   return (
     <div
@@ -43,7 +50,7 @@ export default function ProductCard({ product, onAdd }) {
             ₹{product.price}
           </span>
           <button
-            onClick={() => onAdd(product)}
+             onClick={handleAdd}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
           >
             Add to Cart
