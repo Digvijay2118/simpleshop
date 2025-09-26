@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import ProductListPage from "./pages/ProductListPage";
 import CartPage from "./pages/CartPage";
 import { ToastContainer } from "react-toastify";
+import Footer from "./components/Footer";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/cart" element={<CartPage />} />
         </Routes>
       </main>
+      <Footer/>
       <ToastContainer position="top-right" autoClose={2000} />
     </div>
   );
