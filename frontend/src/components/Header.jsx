@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 export default function Header() {
@@ -7,11 +7,22 @@ export default function Header() {
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
-  function handleSearch(e) {
-    e.preventDefault();
-    if (search.trim()) {
-      navigate(`/?search=${search.trim()}`);
+  // Keep input synced with URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setSearch(params.get("search") || "");
+  }, [location.search]);
+
+  // Update URL on typing
+  function handleChange(e) {
+    const value = e.target.value;
+    setSearch(value);
+    if (value.trim()) {
+      navigate(`/?search=${value.trim()}`);
+    } else {
+      navigate(`/`);
     }
   }
 
@@ -22,16 +33,16 @@ export default function Header() {
           🛒 SimpleShop
         </Link>
 
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-md">
+        {/* Instant Search */}
+        <div className="flex-1 max-w-md">
           <input
             type="text"
             placeholder="Search products..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleChange}
             className="w-full px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-        </form>
+        </div>
 
         {/* Cart */}
         <nav>

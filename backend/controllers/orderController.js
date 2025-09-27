@@ -15,12 +15,14 @@ const placeOrder = async (req, res) => {
       });
     }
 
+        const itemIds = items.map(item => item.id);
+
     const order = {
       id: Date.now(),
       firstName,
       lastName,
       address,
-      items,
+      items:itemIds,
       total,
       createdAt: new Date(),
     };

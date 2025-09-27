@@ -45,6 +45,8 @@ export default function CartPage() {
       toast.success("Order placed successfully!");
       clear();
       setForm({ firstName: "", lastName: "", address: "" });
+          navigate("/thank-you");
+
     } catch (err) {
       toast.error("Order failed!");
     } finally {
@@ -81,7 +83,7 @@ export default function CartPage() {
             </p>
             <button
               onClick={() => navigate("/")}
-              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
             >
               Shop Now
             </button>
@@ -123,7 +125,7 @@ export default function CartPage() {
 
                 <button
                   onClick={() => openRemoveModal(i.id, i.name)}
-                  className="text-red-600 hover:text-red-800 text-sm"
+                  className="text-red-600 hover:text-red-800 text-sm cursor-pointer"
                 >
                   Remove
                 </button>
@@ -169,7 +171,7 @@ export default function CartPage() {
           <button
             onClick={handlePlaceOrder}
             disabled={loading}
-            className="mt-3 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+            className="mt-3 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition cursor-pointer"
           >
             {loading ? "Placing..." : "Place Order"}
           </button>

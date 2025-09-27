@@ -51,7 +51,7 @@ export default function ProductCard({ product, onAdd }) {
           </span>
           <button
              onClick={handleAdd}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
           >
             Add to Cart
           </button>
