@@ -9,13 +9,11 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Keep input synced with URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setSearch(params.get("search") || "");
   }, [location.search]);
 
-  // Update URL on typing
   function handleChange(e) {
     const value = e.target.value;
     setSearch(value);
@@ -33,7 +31,6 @@ export default function Header() {
           🛒 SimpleShop
         </Link>
 
-        {/* Instant Search */}
         <div className="flex-1 max-w-md">
           <input
             type="text"
@@ -44,7 +41,6 @@ export default function Header() {
           />
         </div>
 
-        {/* Cart */}
         <nav>
           <Link
             to="/cart"

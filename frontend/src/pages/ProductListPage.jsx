@@ -12,7 +12,6 @@ export default function ProductListPage() {
   const location = useLocation();
   const [filtered, setFiltered] = useState([]);
 
-  // Filter products whenever query or products change
   useEffect(() => {
     if (!products) return;
     const params = new URLSearchParams(location.search);

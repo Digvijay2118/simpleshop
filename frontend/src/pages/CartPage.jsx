@@ -72,7 +72,6 @@ export default function CartPage() {
 
   return (
     <div className="grid md:grid-cols-3 gap-6">
-      {/* Cart Items */}
       <div className="md:col-span-2 bg-white p-6 rounded-xl shadow">
         <h2 className="text-2xl font-semibold mb-4">Your Cart</h2>
 
@@ -135,7 +134,6 @@ export default function CartPage() {
         )}
       </div>
 
-      {/* Order Summary */}
       {items.length > 0 && (
         <aside className="bg-white p-6 rounded-xl shadow">
           <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
